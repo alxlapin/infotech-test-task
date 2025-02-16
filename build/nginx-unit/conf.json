@@ -1,0 +1,44 @@
+{
+  "listeners": {
+    "*:8080": {
+      "pass": "routes"
+    }
+  },
+
+  "routes": [
+    {
+      "match": {
+        "uri": [
+          "*.php",
+          "*.php/*"
+        ]
+      },
+      "action": {
+        "pass": "applications/infotech/direct"
+      }
+    },
+    {
+      "action": {
+        "share": "/app/web$uri",
+        "fallback": {
+          "pass": "applications/infotech/index"
+        }
+      }
+    }
+  ],
+
+  "applications": {
+    "infotech": {
+      "type": "php",
+      "targets": {
+        "direct": {
+          "root": "/app/web/"
+        },
+        "index": {
+          "root": "/app/web/",
+          "script": "index.php"
+        }
+      }
+    }
+  }
+}

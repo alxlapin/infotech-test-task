@@ -1,0 +1,40 @@
+services:
+  nginx-unit:
+    container_name: srv-unit
+    platform: ${PLATFORM:-linux/amd64}
+    build: ./build
+    volumes:
+      - .:/app
+    environment:
+      APP_ENV: ${APP_ENV:-dev}
+      PHP_IDE_CONFIG: ${PHP_IDE_CONFIG:-serverName=XDebug}
+      XDEBUG_MODE: '${PHP_XDEBUG_MODE:-off}'
+      XDEBUG_CONFIG: '${PHP_XDEBUG_CONFIG:-client_host=host.docker.internal}'
+    ports:
+      - '8080:8080'
+    env_file:
+      - ./.env
+    depends_on:
+      db:
+        condition: service_healthy
+  db:
+    container_name: srv-db
+    platform: ${PLATFORM:-linux/amd64}
+    image: mysql:8.4-oracle
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASS}
+      MYSQL_DATABASE: ${MYSQL_DBNAME}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_USER_PASS}
+    command:
+      - --mysql-native-password=ON
+    volumes:
+      - ./build/dbdata:/var/lib/mysql/
+      - ./build/mysql/init:/docker-entrypoint-initdb.d
+    ports:
+      - '3306:3306'
+    healthcheck:
+      test: mysqladmin ping -h 127.0.0.1 --silent
+      timeout: 20s
+      retries: 10
+      interval: 1s

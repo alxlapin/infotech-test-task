@@ -55,6 +55,7 @@ class User extends ActiveRecord implements IdentityInterface
             [['username', 'password_hash'], 'required'],
             [['username', 'password_hash'], 'string', 'max' => 255],
             [['username'], 'unique'],
+            [['auth_key'], 'string', 'max' => 32],
         ];
     }
 
